@@ -4,6 +4,11 @@ var bodyParser = require('body-parser');
 var nunjucks = require('nunjucks');
 var path = require('path');
 
+const hotelRouter = require('./routes/api/hotels/hotels');
+const restaurantRouter = require('./routes/api/restaurants/restaurants');
+const activityRouter = require('./routes/api/activities/activities');
+const dayMan = require('./routes/api/days/days');
+
 var db = require('./models');
 
 var app = express();
@@ -27,6 +32,10 @@ app.use(express.static(path.join(__dirname, '/public')));
 
 // serve dynamic routes
 app.use(require('./routes'));
+app.use('/api/hotels', hotelRouter);
+app.use('/api/restaurants', restaurantRouter);
+app.use('/api/activities', activityRouter);
+app.use('/api/days', dayMan);
 
 // failed to catch req above means 404, forward to error handler
 app.use(function (req, res, next) {

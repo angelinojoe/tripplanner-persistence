@@ -35,5 +35,32 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQxgWt-LSZcEmTEN8581Uq9SzZHnpuys"></script>
     <script src="/js/map.js"></script>
 
+    <script>
+
+      let hotels = [];
+      let restaurants = [];
+      let activities = []; 
+      
+      Promise.all([$.get('/api/hotels'), $.get('/api/restaurants'), $.get('/api/activities')])
+      .then((results) => {
+        hotels = results[0];
+        restaurants = results[1];
+        activities = results[2];
+
+        hotels.forEach((hotel) => {
+          $('#hotel-choices').append('<option>' + hotel.name + '</option>');
+        });
+        restaurants.forEach((restaurant) => {
+          $('#restaurant-choices').append('<option>' + restaurant.name + '</option>');
+        });
+        activities.forEach((activity) => {
+          $('#activity-choices').append('<option>' + activity.name + '</option>');
+        });
+
+      });
+
+    
+</script>
+
   </body>
 </html>
