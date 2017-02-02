@@ -1,5 +1,5 @@
 // This file should contain all the record creation needed to seed the database with its default values.
-// The data can then be loaded with the node seed.js 
+// The data can then be loaded with the node seed.js
 
 var Promise = require('bluebird');
 var db = require('./models');
@@ -7,6 +7,7 @@ var Place = require('./models/place');
 var Hotel = require('./models/hotel');
 var Restaurant = require('./models/restaurant');
 var Activity = require('./models/activity');
+var Day = require('./models/day');
 
 var data = {
   hotel: [
@@ -76,6 +77,16 @@ db.sync({force: true})
 })
 .then(function () {
   console.log("Finished inserting data (press ctrl-c to exit)");
+  var p1 = Day.create({
+    number: 1
+  });
+  var p2 = Day.create({
+    number: 2
+  });
+  var p3 = Day.create({
+    number: 3
+  });
+
 })
 .catch(function (err) {
   console.error('There was totally a problem', err, err.stack);

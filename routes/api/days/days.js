@@ -18,7 +18,11 @@ router.get('/', (req, res) => {
 ////////////////
 
 router.get('/:id', (req, res) => {
-    Day.findById(req.params.id)
+    Day.findOne({
+        where: {
+            number: req.params.id
+        }
+    })
     .then((day) => {
         res.send(day);
     });
@@ -34,10 +38,23 @@ router.post('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    Day.findById(req.params.id)
+    Day.findOne({
+        where: {
+            number: req.params.id
+        }
+    })
     .then((day) => {
-        day.destroy();
-    });
+        console.log('starting to renumber', new Date().getMilliseconds());
+         var p1 = Day.renumberDays(day.number);
+         var p2 = day.destroy();
+         return Promise.all([p1,p2])
+   })
+   .then(() => {
+       console.log('ending', new Date().getMilliseconds());
+       res.end();
+   });
+
+
 });
 
 
@@ -65,7 +82,7 @@ router.post('/:id/restaurants/', (req, res) => {
         where: {
             id: req.params.id
     }});
-    
+
     let findingRestaurant = Restaurant.findOne({
         where: {
             name: req.body.name
@@ -81,7 +98,7 @@ router.post('/:id/restaurants/', (req, res) => {
 
         console.log("Restaurant added:", restaurant.name);
         res.end();
-    }); 
+    });
 });
 
 
@@ -103,14 +120,14 @@ router.delete(':dayId/hotels/:hotelId', (req, res) => {
     })
 });
 
-router.post('/:id/hotels/', (req, res) => {
+router.post('/:id/hotels', (req, res) => {
 
     let findingDay = Day.findOne({
         where: {
             id: req.params.id
     }});
-    
-    let findingHotel = HOtel.findOne({
+
+    let findingHotel = Hotel.findOne({
         where: {
             name: req.body.name
         }
@@ -121,11 +138,11 @@ router.post('/:id/hotels/', (req, res) => {
         let day = result[0];
         let hotel = result[1];
 
-        day.addHotel(hotel);
+        day.setHotel(hotel);
 
         console.log("Hotel added:", hotel.name);
         res.end();
-    }); 
+    });
 });
 
 
@@ -152,7 +169,7 @@ router.post('/:id/activities/', (req, res) => {
         where: {
             id: req.params.id
     }});
-    
+
     let findingActivity = Activity.findOne({
         where: {
             name: req.body.name
@@ -168,7 +185,7 @@ router.post('/:id/activities/', (req, res) => {
 
         console.log("Activity added:", activity.name);
         res.end();
-    }); 
+    });
 });
 
 module.exports = router;

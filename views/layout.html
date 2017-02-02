@@ -36,16 +36,19 @@
     <script src="/js/map.js"></script>
 
     <script>
-
+      let dayCounter = 0;
       let hotels = [];
       let restaurants = [];
-      let activities = []; 
-      
-      Promise.all([$.get('/api/hotels'), $.get('/api/restaurants'), $.get('/api/activities')])
+      let activities = [];
+      let days = [];
+
+
+      Promise.all([$.get('/api/hotels'), $.get('/api/restaurants'), $.get('/api/activities'), $.get('/api/days')])
       .then((results) => {
         hotels = results[0];
         restaurants = results[1];
         activities = results[2];
+        days = results[3];
 
         hotels.forEach((hotel) => {
           $('#hotel-choices').append('<option>' + hotel.name + '</option>');
@@ -56,10 +59,96 @@
         activities.forEach((activity) => {
           $('#activity-choices').append('<option>' + activity.name + '</option>');
         });
+        reloadDays();
+        $('.day-btn').first().addClass('current-day');
 
       });
 
-    
+      $('#day-add').on('click', function(){
+        $.post('/api/days/' + (dayCounter + 1))
+        .then((newDay) => {
+          dayCounter++;
+          days.push(newDay);
+          var $newBtn = $('<button type="day" class="btn btn-circle day-btn">' + newDay.number + '</button>').insertBefore('#day-add');
+          $($newBtn).on('click', function(){
+            $('.current-day').removeClass('current-day');
+            $(this).addClass('current-day');
+            $('#day-title > span').text('Day ' + newDay.number);
+          })
+        });
+
+      });
+
+      function reloadDays(){
+        console.log(days);
+        $('[type="day"]').remove();
+        days.forEach((day) => {
+          dayCounter++;
+          var $newBtn =$('<button type="day" class="btn btn-circle day-btn">' + day.number + '</button>').insertBefore('#day-add');
+          $($newBtn).on('click', function(){
+            $('.current-day').removeClass('current-day');
+            $(this).addClass('current-day');
+            $('#day-title > span').text('Day ' + day.number);
+        });
+        })
+      }
+
+     $('#day-title > button').on('click', function(){
+       var dayToDelete = +$('.current-day').text();
+       $.ajax({
+         url: ('/api/days/' + dayToDelete),
+         type: 'DELETE'
+       })
+       .then(() => {
+         $('.current-day').remove();
+         return $.get('/api/days')
+       })
+       .then((newDays) => {
+           days = newDays;
+           reloadDays();
+         })
+     })
+
+     $('[data-type="hotel"]').next('button').on('click', function(){
+       var dayNum = +$('.current-day').text();
+       var hotel = $('#hotel-choices').val();
+       $.ajax({
+         url: '/api/days/' + dayNum + '/hotels',
+         type: 'POST',
+         data: {name: hotel}
+       })
+       .then(() => {
+         $('[type="hotel"]').append(`<span class="title">${hotel}</span>
+                <button class="btn btn-xs btn-danger remove btn-circle">x</button>`)
+       })
+     })
+     $('[data-type="restaurant"]').next('button').on('click', function(){
+       var dayNum = +$('.current-day').text();
+       var rest = $('#restaurant-choices').val();
+       $.ajax({
+         url: '/api/days/' + dayNum + '/restaurants',
+         type: 'POST',
+         data: {name: rest}
+       })
+       .then(() => {
+         $('[type="restaurant"]').append(`<span class="title">${rest}</span>
+                <button class="btn btn-xs btn-danger remove btn-circle">x</button>`)
+       })
+     })
+     $('[data-type="activity"]').next('button').on('click', function(){
+       var dayNum = +$('.current-day').text();
+       var act = $('#activity-choices').val();
+       $.ajax({
+         url: '/api/days/' + dayNum + '/activities',
+         type: 'POST',
+         data: {name: act}
+       })
+       .then(() => {
+         $('[type="activity"]').append(`<span class="title">${act}</span>
+                <button class="btn btn-xs btn-danger remove btn-circle">x</button>`)
+       })
+     })
+
 </script>
 
   </body>
