@@ -24,8 +24,19 @@ router.get('/:id', (req, res) => {
         }
     })
     .then((day) => {
-        res.send(day);
-    });
+        let gettingHotel = day.getHotel();
+        let gettingRestaurants = day.getRestaurants();
+        let gettingActivities = day.getActivities();
+
+        return Promise.all([gettingHotel, gettingRestaurants, gettingActivities]);
+    })
+    .then((results) => {
+
+        let hotel = results[0];
+        let restaurants = results[1];
+        let activities = results[2];
+        res.send({hotel, restaurants, activities});
+    })
 });
 
 router.post('/:id', (req, res) => {

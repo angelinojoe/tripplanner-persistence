@@ -74,9 +74,16 @@
             $('.current-day').removeClass('current-day');
             $(this).addClass('current-day');
             $('#day-title > span').text('Day ' + newDay.number);
-          })
-        });
 
+            $.get('api/days/' + newDay.number)
+            .then((dayInfo) => {
+              let hotel = dayInfo.hotel;
+              let restaurants = dayInfo.restaurants;
+              let activities = dayInfo.activities;
+              console.log(hotel, restaurants, activities);
+            });
+          });
+        });
       });
 
       function reloadDays(){
@@ -89,6 +96,14 @@
             $('.current-day').removeClass('current-day');
             $(this).addClass('current-day');
             $('#day-title > span').text('Day ' + day.number);
+
+            $.get('api/days/' + day.number)
+            .then((dayInfo) => {
+              let hotel = dayInfo.hotel;
+              let restaurants = dayInfo.restaurants;
+              let activities = dayInfo.activities;
+              console.log(hotel, restaurants, activities);
+            });
         });
         })
       }
